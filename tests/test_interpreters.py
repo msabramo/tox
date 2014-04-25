@@ -2,14 +2,15 @@ import sys
 import os
 
 import pytest
-from tox.interpreters import *
 
 @pytest.fixture
 def interpreters():
+    from tox.interpreters import Interpreters
     return Interpreters()
 
 @pytest.mark.skipif("sys.platform != 'win32'")
 def test_locate_via_py(monkeypatch):
+    from tox.interpreters import locate_via_py, py
     class PseudoPy:
         def sysexec(self, *args):
             assert args[0] == '-3.2'
@@ -25,6 +26,7 @@ def test_locate_via_py(monkeypatch):
     assert locate_via_py('3', '2') == sys.executable
 
 def test_find_executable():
+    from tox.interpreters import find_executable, py
     p = find_executable(sys.executable)
     assert p == py.path.local(sys.executable)
     for ver in [""] + "2.4 2.5 2.6 2.7 3.0 3.1 3.2 3.3".split():
@@ -46,6 +48,7 @@ def test_find_executable():
         assert ver in py.builtin._totext(stderr, "ascii")
 
 def test_find_executable_extra(monkeypatch):
+    from tox.interpreters import find_executable, py
     @staticmethod
     def sysfind(x):
         return "hello"
@@ -54,6 +57,7 @@ def test_find_executable_extra(monkeypatch):
     assert t == "hello"
 
 def test_run_and_get_interpreter_info():
+    from tox.interpreters import run_and_get_interpreter_info
     name = os.path.basename(sys.executable)
     info = run_and_get_interpreter_info(name, sys.executable)
     assert info.version_info == tuple(sys.version_info)
